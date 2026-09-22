@@ -32,11 +32,11 @@ public class Main
         if(difficulty.equals("easy")) {
             boardNew = new Board(9,9,10);
         }
-        else if(difficulty.equals("medium")
+        else if(difficulty.equals("medium"))
             {
             boardNew = new Board(16,16,40);
             }
-        else if(difficulty.equals("hard")
+        else if(difficulty.equals("hard"))
             {
             boardNew = new Board(30,16,99);
             }
@@ -46,7 +46,7 @@ public class Main
         }
         return boardNew;
         
-       //create if statemtents going through if easy, medium, or hard 
+       //create if statements going through if easy, medium, or hard 
        
         
     }
@@ -65,11 +65,35 @@ public class Main
     }
     public boolean scannerWin(Scanner scanner)
     {
-        
+        System.out.print("You win! Would you like to play again(yes/no)? ");
+        String response = scanner.next();
+        if(response.equals("yes"))
+        {
+            return true;
+        }
+        else if(response.equals("no")) {
+            return false;
+        }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
     }
     public boolean scannerLose(Scanner scanner)
     {
-        
+        System.out.print("KABOOM. You hit a bomb :(. Would you like to play again(yes/no)? ");
+        String response = scanner.next();
+        if(response.equals("yes"))
+        {
+            return true;
+        }
+        else if(response.equals("no")) {
+            return false;
+        }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
     }
     //~ Fields ................................................................
 
