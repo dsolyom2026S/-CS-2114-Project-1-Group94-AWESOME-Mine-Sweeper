@@ -1,10 +1,14 @@
 package minesweeper;
 import java.util.Scanner;
-public class Main
+
 /**
  * 
  */
+public class Main
 {
+    private Board newBoard;
+    
+    
     /**
      * Runs the main game loop
      * @param args this lets us know what kind of game are we doing
@@ -20,14 +24,30 @@ public class Main
      * @param scanner this scans the user input to see what the coordinates are
      * @return returns a board in which the new game will be played on
      */
-    public board newGame(Scanner scannner)
+    public Board newGame(Scanner scanner)
     {
+        
         System.out.print("Enter your what difficulty you want easy medium or hard: ");
-        scanner.next();
+        String difficulty = scanner.next();
+        if(difficulty.equals("easy")) {
+            boardNew = new Board(9,9,10);
+        }
+        else if(difficulty.equals("medium")
+            {
+            boardNew = new Board(16,16,40);
+            }
+        else if(difficulty.equals("hard")
+            {
+            boardNew = new Board(30,16,99);
+            }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
+        return boardNew;
         
        //create if statemtents going through if easy, medium, or hard 
-       Board boardNew = new Board();
-       main.create
+       
         
     }
     /**
