@@ -17,7 +17,7 @@ public class Main
      *            going to be a custom game or regular game
      */
     public void main(String[] args)
-    {
+    {   
         
     }
 
@@ -70,7 +70,9 @@ public class Main
      */
     public void customGame(Scanner scanner, Board board)
     {
-        
+        System.out
+        .print("Enter your what difficulty you want easy medium or hard: ");
+    String difficulty = scanner.next();
     }
 
 
