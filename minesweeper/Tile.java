@@ -1,10 +1,19 @@
 //Group Project-1-Group94
 package minesweeper;
 /**
+<<<<<<< Updated upstream
  * An object of the Tile class represents one individual square on the
  * Minesweeper board. It Stores whether it is covered, flagged, or a mine,
  * along with its surrounding mine count, coordinates, BFS search level, and 
  * reference to its Board.
+=======
+ * Represents A single minesweeper tile.
+ * Should be able to return an array of all neighbors.
+ * Should have a variable for isMine.
+ * Should have a counter for the number of mines around it with a checker method that updates.
+ * Should have isCovered variable with getter/setter.
+ * Should have a isFlaged variable with getter/setter.
+>>>>>>> Stashed changes
  *
  * @author David Solyom (dsolyom)
  * @version 2026.09.08
@@ -34,8 +43,8 @@ public class Tile{
        this.tileColumn = tileColumn;
    }
    
-   public Tile[] CheckTop(){
-       private Tile[] top;
+   public Tile[] CheckAround(){
+       Arraylist <Tile>  top;
        if(tileRow != 0) {
            if(tileColumn != 0) {
                if(tileColumn != (tileArr[tileRow].length-1)){
