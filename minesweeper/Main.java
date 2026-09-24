@@ -18,7 +18,69 @@ public class Main
      */
     public void main(String[] args)
     {   
-        
+        Scanner scanner = new Scanner(System.in);
+        Main game = new Main();
+        boolean custom = args.length > 0 && args[0].equals("custom");
+        boolean playAgain = true;
+ 
+        while (playAgain)
+        {
+            if (custom)
+            {
+                System.out.print("Enter number of rows and columns: ");
+                int rows = scanner.nextInt();
+                int cols = scanner.nextInt();
+                game.newBoard = new Board(rows, cols, 0);
+                game.customGame(scanner, game.newBoard);
+            }
+            else
+            {
+                boolean chosen = false;
+                while (!chosen)
+                {
+                    try
+                    {
+                        game.newBoard = game.newGame(scanner);
+                        chosen = true;
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        System.out.println("Invalid difficulty, try again.");
+                    }
+                }
+            }
+ 
+            // Play until the game is won or lost
+            while (!game.newBoard.getGameOver() && !game.newBoard.checkWin())
+            {
+                System.out.println(game.newBoard.boardToString());
+                System.out.println(game.getUserInput(scanner));
+            }
+            System.out.println(game.newBoard.boardToString());
+ 
+            boolean answered = false;
+            while (!answered)
+            {
+                try
+                {
+                    if (game.newBoard.getGameOver())
+                    {
+                        playAgain = game.scannerLose(scanner);
+                    }
+                    else
+                    {
+                        playAgain = game.scannerWin(scanner);
+                    }
+                    answered = true;
+                }
+                catch (IllegalArgumentException e)
+                {
+                    System.out.println("Please answer yes or no.");
+                }
+            }
+        }
+        scanner.close();
+
     }
 
 
@@ -51,6 +113,7 @@ public class Main
         {
             throw new IllegalArgumentException();
         }
+        scanner.close();
         return boardNew;
 
         // create if statements going through if easy, medium, or hard
@@ -87,8 +150,57 @@ public class Main
      */
     public String getUserInput(Scanner scanner)
     {
-           String string = "";
-           return string;
+        System.out.print("Enter command (r row col / f row col): ");
+        String command = scanner.next();
+ 
+        if (!command.equals("r") && !command.equals("f"))
+        {
+            return "Invalid command.";
+        }
+ 
+        if (!scanner.hasNextInt())
+        {
+            if (scanner.hasNext())
+            {
+                scanner.next();
+            }
+            return "Invalid coordinates.";
+        }
+        int row = scanner.nextInt();
+ 
+        if (!scanner.hasNextInt())
+        {
+            if (scanner.hasNext())
+            {
+                scanner.next();
+            }
+            return "Invalid coordinates.";
+        }
+        int col = scanner.nextInt();
+ 
+        if (!newBoard.inBounds(row, col))
+        {
+            return "Coordinates out of bounds.";
+        }
+ 
+        Tile tile = newBoard.getTile(row, col);
+ 
+        if (command.equals("f"))
+        {
+            if (!tile.getCovered())
+            {
+                return "Cannot flag a revealed tile.";
+            }
+            newBoard.Flag(row, col);
+            return tile.getFlag() ? "Tile flagged." : "Flag removed.";
+        }
+ 
+        if (tile.getFlag() || !tile.getCovered())
+        {
+            return "Cannot reveal that tile.";
+        }
+        newBoard.revealTile(row, col);
+        return "Tile revealed.";
     }
 
 
