@@ -3,7 +3,11 @@ package minesweeper;
 import java.util.Scanner;
 
 /**
- * 
+ * Runs the console version of Minesweeper. Handles menus, reading player
+ * commands, and the play-again loop. Game logic lives in Board and Tile.
+ *
+ * Run with no arguments for a normal game, or with "custom" for a game where
+ * you place the mines yourself.
  */
 public class Main
 {
@@ -11,25 +15,25 @@ public class Main
 
     /**
      * Runs the main game loop
-     * 
+     *
      * @param args
-     *            this lets us know what kind of game are we doing whether its
-     *            going to be a custom game or regular game
+     *            "custom" starts a custom game; anything else (or nothing)
+     *            starts a regular game
      */
-    public void main(String[] args)
-    {   
+    public static void main(String[] args)
+    {
         Scanner scanner = new Scanner(System.in);
         Main game = new Main();
         boolean custom = args.length > 0 && args[0].equals("custom");
         boolean playAgain = true;
- 
+
         while (playAgain)
         {
             if (custom)
             {
-                System.out.print("Enter number of rows and columns: ");
-                int rows = scanner.nextInt();
-                int cols = scanner.nextInt();
+                int rows = game.readPositiveInt(scanner, "Enter number of rows: ");
+                int cols =
+                    game.readPositiveInt(scanner, "Enter number of columns: ");
                 game.newBoard = new Board(rows, cols, 0);
                 game.customGame(scanner, game.newBoard);
             }
@@ -49,15 +53,25 @@ public class Main
                     }
                 }
             }
- 
+
             // Play until the game is won or lost
             while (!game.newBoard.getGameOver() && !game.newBoard.checkWin())
             {
                 System.out.println(game.newBoard.boardToString());
-                System.out.println(game.getUserInput(scanner));
+
+                // Keep asking until the player gives a usable command
+                String result = game.getUserInput(scanner);
+                System.out.println(result);
+                while (isError(result))
+                {
+                    System.out.println(
+                        "Please try again: r row col (reveal) or f row col (flag).");
+                    result = game.getUserInput(scanner);
+                    System.out.println(result);
+                }
             }
             System.out.println(game.newBoard.boardToString());
- 
+
             boolean answered = false;
             while (!answered)
             {
@@ -80,63 +94,82 @@ public class Main
             }
         }
         scanner.close();
+    }
 
+
+    /**
+     * returns the board currently being played
+     *
+     * @return current board
+     */
+    public Board getBoard()
+    {
+        return newBoard;
+    }
+
+
+    /**
+     * sets the board currently being played
+     *
+     * @param board
+     *            board to play on
+     */
+    public void setBoard(Board board)
+    {
+        newBoard = board;
     }
 
 
     /**
      * creates a new game
-     * 
+     *
      * @param scanner
-     *            this scans the user input to see what the coordinates are
+     *            this scans the user input for the difficulty
      * @return returns a board in which the new game will be played on
+     * @throws IllegalArgumentException
+     *             if difficulty is not easy, medium, or hard
      */
     public Board newGame(Scanner scanner)
     {
-
         System.out
-            .print("Enter your what difficulty you want easy medium or hard: ");
+            .print("Enter what difficulty you want (easy, medium, or hard): ");
         String difficulty = scanner.next();
         if (difficulty.equals("easy"))
         {
-            boardNew = new Board(9, 9, 10);
+            newBoard = new Board(9, 9, 10);
         }
         else if (difficulty.equals("medium"))
         {
-            boardNew = new Board(16, 16, 40);
+            newBoard = new Board(16, 16, 40);
         }
         else if (difficulty.equals("hard"))
         {
-            boardNew = new Board(30, 16, 99);
+            newBoard = new Board(30, 16, 99);
         }
         else
         {
             throw new IllegalArgumentException();
         }
-        scanner.close();
-        return boardNew;
-
-        // create if statements going through if easy, medium, or hard
-
+        return newBoard;
     }
 
 
     /**
-     * creates a new custom game
-     * 
+     * sets up a custom game by placing mines where the user says.
+     * The user enters "row col" pairs, then "done" to finish.
+     *
      * @param scanner
-     *            this scans the user input to see what the coordinates are of
-     *            the mines
+     *            this scans the user input for the mine coordinates
      * @param board
      *            this gives the board on which to place the mines on
-     * @return returns a custom board in which the new game will be played on
+     * @postcondition board is ready to play (counters calculated)
      */
     public void customGame(Scanner scanner, Board board)
     {
         newBoard = board;
         System.out.println(
             "Enter mine locations as: row col. Type done when finished.");
- 
+
         while (scanner.hasNext())
         {
             String token = scanner.next();
@@ -144,16 +177,16 @@ public class Main
             {
                 break;
             }
- 
+
             if (!scanner.hasNextInt() || !isInt(token))
             {
                 System.out.println("Invalid input, use: row col");
                 continue;
             }
- 
+
             int row = Integer.parseInt(token);
             int col = scanner.nextInt();
- 
+
             if (board.inBounds(row, col))
             {
                 board.getTile(row, col).setMine(true);
@@ -163,14 +196,16 @@ public class Main
                 System.out.println("Coordinates out of bounds.");
             }
         }
- 
+
         board.finalizeCustomGame();
     }
 
 
     /**
-     * This gets the user input on where they want to place a flag, or click
-     * 
+     * This gets the user input on where they want to place a flag, or click,
+     * and applies it to the board. Commands: "r row col" (reveal) or
+     * "f row col" (flag/unflag).
+     *
      * @param scanner
      *            this scans the user inputs, such as coordinates and the flag
      *            button
@@ -181,39 +216,35 @@ public class Main
     {
         System.out.print("Enter command (r row col / f row col): ");
         String command = scanner.next();
- 
+
         if (!command.equals("r") && !command.equals("f"))
         {
+            skipRestOfLine(scanner);
             return "Invalid command.";
         }
- 
+
         if (!scanner.hasNextInt())
         {
-            if (scanner.hasNext())
-            {
-                scanner.next();
-            }
+            skipRestOfLine(scanner);
             return "Invalid coordinates.";
         }
         int row = scanner.nextInt();
- 
+
         if (!scanner.hasNextInt())
         {
-            if (scanner.hasNext())
-            {
-                scanner.next();
-            }
+            skipRestOfLine(scanner);
             return "Invalid coordinates.";
         }
         int col = scanner.nextInt();
- 
+
         if (!newBoard.inBounds(row, col))
         {
+            skipRestOfLine(scanner);
             return "Coordinates out of bounds.";
         }
- 
+
         Tile tile = newBoard.getTile(row, col);
- 
+
         if (command.equals("f"))
         {
             if (!tile.getCovered())
@@ -223,7 +254,7 @@ public class Main
             newBoard.Flag(row, col);
             return tile.getFlag() ? "Tile flagged." : "Flag removed.";
         }
- 
+
         if (tile.getFlag() || !tile.getCovered())
         {
             return "Cannot reveal that tile.";
@@ -234,9 +265,9 @@ public class Main
 
 
     /**
-     * this tells the user whether they win or not
-     * 
-     * @return returns true if they win false if lose
+     * tells the user they won and asks whether to play again
+     *
+     * @return returns true if they want to play again, false if not
      * @param scanner
      *            which scans the user input
      */
@@ -260,9 +291,9 @@ public class Main
 
 
     /**
-     * this tells the user whether they win or not
-     * 
-     * @return returns true if they win false if lose
+     * tells the user they lost and asks whether to play again
+     *
+     * @return returns true if they want to play again, false if not
      * @param scanner
      *            which scans the user input
      */
@@ -281,14 +312,69 @@ public class Main
         }
         else
         {
-            // might change to have a message play saying invalid input
             throw new IllegalArgumentException();
         }
     }
-    // ~ Fields ................................................................
 
-    // ~ Constructors ..........................................................
 
-    // ~Public Methods ........................................................
+    /**
+     * asks for a positive whole number, re-asking until the user gives one
+     *
+     * @param scanner
+     *            which scans the user input
+     * @param prompt
+     *            the message shown before each attempt
+     * @return the positive number the user entered
+     */
+    public int readPositiveInt(Scanner scanner, String prompt)
+    {
+        while (true)
+        {
+            System.out.print(prompt);
+            String token = scanner.next();
+            if (isInt(token) && Integer.parseInt(token) > 0)
+            {
+                return Integer.parseInt(token);
+            }
+            System.out.println("Invalid input, enter a positive whole number.");
+        }
+    }
 
+
+    /**
+     * checks whether a message from getUserInput means the command failed
+     *
+     * @param message
+     *            message returned by getUserInput
+     * @return true if the command was not carried out
+     */
+    public static boolean isError(String message)
+    {
+        return message.startsWith("Invalid")
+            || message.startsWith("Coordinates")
+            || message.startsWith("Cannot");
+    }
+
+
+    private static void skipRestOfLine(Scanner scanner)
+    {
+        if (scanner.hasNextLine())
+        {
+            scanner.nextLine();
+        }
+    }
+
+
+    private static boolean isInt(String s)
+    {
+        try
+        {
+            Integer.parseInt(s);
+            return true;
+        }
+        catch (NumberFormatException e)
+        {
+            return false;
+        }
+    }
 }
