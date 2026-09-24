@@ -133,9 +133,38 @@ public class Main
      */
     public void customGame(Scanner scanner, Board board)
     {
-        System.out
-        .print("Enter your what difficulty you want easy medium or hard: ");
-    String difficulty = scanner.next();
+        newBoard = board;
+        System.out.println(
+            "Enter mine locations as: row col. Type done when finished.");
+ 
+        while (scanner.hasNext())
+        {
+            String token = scanner.next();
+            if (token.equals("done"))
+            {
+                break;
+            }
+ 
+            if (!scanner.hasNextInt() || !isInt(token))
+            {
+                System.out.println("Invalid input, use: row col");
+                continue;
+            }
+ 
+            int row = Integer.parseInt(token);
+            int col = scanner.nextInt();
+ 
+            if (board.inBounds(row, col))
+            {
+                board.getTile(row, col).setMine(true);
+            }
+            else
+            {
+                System.out.println("Coordinates out of bounds.");
+            }
+        }
+ 
+        board.finalizeCustomGame();
     }
 
 
