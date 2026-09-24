@@ -9,7 +9,7 @@ package minesweeper;
  * win/loss conditions, custom boards, and creating the printable board.
  *
  * @author David Solyom (dsolyom)
- * @version 2026.09.23
+ * @version 2026.09.24
  */
 public class Board {
 
@@ -71,26 +71,48 @@ public class Board {
      */
     public String boardToString() {
 
-        String result = "";
+        String result = "       COLUMNS\n";
 
+        // Print column numbers across top of board.
+        result += "       ";
+        for (int col = 0; col < columns; col++) {
+            if (col > 0) {
+                result += "  ";
+            }
+            result += col;
+        }
+        result += "\n";
+
+        // Print each row number along left side of board.
         for (int row = 0; row < rows; row++) {
+            result += "ROW " + row;
+            if (row < 10) {
+                result += "  ";
+            }
+            else {
+                result += " ";
+            }
+
             for (int col = 0; col < columns; col++) {
+                if (col > 0) {
+                    result += "  ";
+                }
 
                 Tile tile = board[row][col];
 
                 if (tile.getCovered()) {
                     if (tile.getFlag()) {
-                        result += "F ";
+                        result += "F";
                     }
                     else {
-                        result += "# ";
+                        result += "#";
                     }
                 }
                 else if (tile.getMine()) {
-                    result += "* ";
+                    result += "*";
                 }
                 else {
-                    result += tile.getCounter() + " ";
+                    result += tile.getCounter();
                 }
             }
 
@@ -238,13 +260,16 @@ public class Board {
     // ----------------------------------------------------------
 
     /**
-     * randomly places mines while protecting first clicked tile
+     * randomly places mines while protecting the first click and all 8
+     * surrounding neighbors. This guarantees the first revealed tile has a
+     * counter of 0, so BFS will expand from it.
      *
      * @param safeRow
-     *            row that cannot contain a mine
+     *            row of first clicked tile
      * @param safeCol
-     *            column that cannot contain a mine
-     * @postcondition requested number of mines are placed
+     *            column of first clicked tile
+     * @postcondition requested number of mines are placed outside the 3x3 safe
+     *                zone centered on the first click
      */
     public void generateMines(int safeRow, int safeCol) {
 
@@ -255,8 +280,9 @@ public class Board {
             int row = (int)(Math.random() * rows);
             int col = (int)(Math.random() * columns);
 
-            // First clicked tile must stay safe
-            if (row == safeRow && col == safeCol) {
+            // First clicked tile and all touching neighbors must stay safe.
+            if (Math.abs(row - safeRow) <= 1
+                && Math.abs(col - safeCol) <= 1) {
                 continue;
             }
 

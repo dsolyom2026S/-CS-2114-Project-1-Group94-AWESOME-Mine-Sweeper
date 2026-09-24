@@ -8,6 +8,9 @@ import java.util.Scanner;
  *
  * Run with no arguments for a normal game, or with "custom" for a game where
  * you place the mines yourself.
+ *
+ * @author Group 94
+ * @version 2026.09.24
  */
 public class Main
 {

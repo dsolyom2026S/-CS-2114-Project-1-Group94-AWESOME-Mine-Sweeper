@@ -51,7 +51,7 @@ public class BoardTest extends TestCase {
         board.getTile(1, 0).setCovered(false);
         board.getTile(0, 0).setCovered(false);
 
-        assertEquals("* F \n1 # \n", board.boardToString());
+        assertEquals("       COLUMNS\n       0  1\nROW 0  *  F\nROW 1  1  #\n", board.boardToString());
     }
 
     /**
@@ -174,7 +174,14 @@ public class BoardTest extends TestCase {
         }
 
         assertEquals(6, mines);
-        assertFalse(board.getTile(2, 2).getMine());
+
+        // Entire 3x3 area around first click must be mine-free so the
+        // first tile is guaranteed to have a counter of 0.
+        for (int row = 1; row <= 3; row++) {
+            for (int col = 1; col <= 3; col++) {
+                assertFalse(board.getTile(row, col).getMine());
+            }
+        }
     }
 
     /**
@@ -184,19 +191,25 @@ public class BoardTest extends TestCase {
      */
     public void testGenerateMinesRetryPaths() {
         for (int run = 0; run < 40; run++) {
-            Board board = new Board(2, 2, 3);
+            Board board = new Board(3, 3, 5);
             board.generateMines(0, 0);
+
+            // Corner first click protects a 2x2 area. Five other locations
+            // remain available for mines.
             assertFalse(board.getTile(0, 0).getMine());
+            assertFalse(board.getTile(0, 1).getMine());
+            assertFalse(board.getTile(1, 0).getMine());
+            assertFalse(board.getTile(1, 1).getMine());
 
             int mines = 0;
-            for (int row = 0; row < 2; row++) {
-                for (int col = 0; col < 2; col++) {
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) {
                     if (board.getTile(row, col).getMine()) {
                         mines++;
                     }
                 }
             }
-            assertEquals(3, mines);
+            assertEquals(5, mines);
         }
     }
 
