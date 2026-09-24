@@ -55,7 +55,7 @@ public class Board {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
-                board[row][col] = new Tile(false, board, row, col);
+                board[row][col] = new Tile(this, row, col);
             }
         }
 
@@ -306,28 +306,7 @@ public class Board {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
 
-                int count = 0;
-
-                for (int rowChange = -1; rowChange <= 1; rowChange++) {
-                    for (int colChange = -1; colChange <= 1; colChange++) {
-
-                        // Skip current tile
-                        if (rowChange == 0 && colChange == 0) {
-                            continue;
-                        }
-
-                        int checkRow = row + rowChange;
-                        int checkCol = col + colChange;
-
-                        if (inBounds(checkRow, checkCol)
-                            && board[checkRow][checkCol].getMine()) {
-
-                            count++;
-                        }
-                    }
-                }
-
-                board[row][col].setCounter(count);
+                board[row][col].findCounter();
             }
         }
     }

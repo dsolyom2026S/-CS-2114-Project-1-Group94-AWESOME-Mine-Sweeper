@@ -79,11 +79,11 @@ public class Main
                 {
                     if (game.newBoard.getGameOver())
                     {
-                        playAgain = game.scannerLose(scanner);
+                        playAgain = game.userLose(scanner);
                     }
                     else
                     {
-                        playAgain = game.scannerWin(scanner);
+                        playAgain = game.userWin(scanner);
                     }
                     answered = true;
                 }
@@ -271,7 +271,7 @@ public class Main
      * @param scanner
      *            which scans the user input
      */
-    public boolean scannerWin(Scanner scanner)
+    public boolean userWin(Scanner scanner)
     {
         System.out.print("You win! Would you like to play again(yes/no)? ");
         String response = scanner.next();
@@ -291,13 +291,26 @@ public class Main
 
 
     /**
+     * Compatibility wrapper for earlier tests/code.
+     *
+     * @param scanner
+     *            scanner containing the player's answer
+     * @return true when player wants another game
+     */
+    public boolean scannerWin(Scanner scanner)
+    {
+        return userWin(scanner);
+    }
+
+
+    /**
      * tells the user they lost and asks whether to play again
      *
      * @return returns true if they want to play again, false if not
      * @param scanner
      *            which scans the user input
      */
-    public boolean scannerLose(Scanner scanner)
+    public boolean userLose(Scanner scanner)
     {
         System.out.print(
             "KABOOM. You hit a bomb :(. Would you like to play again(yes/no)? ");
@@ -314,6 +327,19 @@ public class Main
         {
             throw new IllegalArgumentException();
         }
+    }
+
+
+    /**
+     * Compatibility wrapper for earlier tests/code.
+     *
+     * @param scanner
+     *            scanner containing the player's answer
+     * @return true when player wants another game
+     */
+    public boolean scannerLose(Scanner scanner)
+    {
+        return userLose(scanner);
     }
 
 
