@@ -73,7 +73,6 @@ public class Main
         System.out
         .print("Enter your what difficulty you want easy medium or hard: ");
     String difficulty = scanner.next();
-    
     }
 
 
