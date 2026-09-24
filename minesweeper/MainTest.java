@@ -7,7 +7,7 @@ public class MainTest
 
     private Main game;
     
-    @Before
+  
     public void setUp() {
         game = new Main();
     }
@@ -19,7 +19,7 @@ public class MainTest
     //~ Fields ................................................................
     @Test
     public void testNewGameEasy() {
-        Board b = game.newGame(in("easy"));
+        Board b = game.newGame(("easy"));
         assertNotNull(b);
         assertNotNull(b.getTile(8, 8));
         assertFalse(b.inBounds(9, 9));
